@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Fısıltı">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRsSxc8SxbHTEsSIsInNob3J0X25hbWUiOiJGxLFzxLFsdMSxIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJ0aGVtZV9jb2xvciI6IiM2MzY2ZjEiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lpSUhodGJHNXpQU0pvZEhSd09pOHZkM2QzTG5jekxtOXlaeTh5TURBd0wzTjJaeUkrUEhKbFkzUWdkMmxrZEdnOUlqRXlPQ0luSUdobGFXZG9kRDBpTVRJNElpQm1hV3hzUFNJak5qTTJObVl4SWk4K1BIUmxlSFFnZUQwaU5qUWlJSGs5SWpZMElpQjBlWFIwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJrZVQwaUxqTmxiU0luSUdadmJuUXRabUZ0YVd4NVBTSkJjbWxoYkNJZ1ptOXVkQzF6YVhwbFBTSXlOQ0luSUdacGJHdzlJaU5tWm1abVptWWlQa1k4TDNSbGVIUStQQzl6ZG1jKyIsInNpemVzIjoiMTI4eDEyOCIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+    <title>Fısıltı - AI Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&family=Dancing+Script&family=Merriweather&family=Orbitron&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            transition: background 1.5s ease-in-out;
+            -webkit-overflow-scrolling: touch;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            overscroll-behavior: none;
+        }
+        
+        /* Mobile-first responsive design */
+        @media (max-width: 640px) {
+            .main-container {
+                height: 100vh;
+                height: 100dvh;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .chat-container {
+                flex: 1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .mobile-header {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                flex-shrink: 0;
+            }
+            
+            .mobile-input-area {
+                position: sticky;
+                bottom: 0;
+                background: white;
+                border-top: 1px solid #e5e7eb;
+                flex-shrink: 0;
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+            
+            .mobile-keyboard-safe {
+                padding-bottom: env(keyboard-inset-height, 0px);
+            }
+            
+            .app-container {
+                border-radius: 0;
+                height: 100vh;
+                height: 100dvh;
+                max-width: none;
+            }
+        }
+        
+        /* Touch-friendly button sizes */
+        @media (max-width: 768px) {
+            button {
+                min-height: 44px;
+                min-width: 44px;
+                touch-action: manipulation;
+            }
+            
+            input, select, textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+                touch-action: manipulation;
+            }
+            
+            .message-bubble {
+                max-width: 85%;
+            }
+            
+            .touch-target {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+        
+        /* Landscape mobile optimization */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .fisilti-tagline {
+                display: none;
+            }
+            
+            .logo-container {
+                padding: 0.5rem 0;
+            }
+        }
+        
+        /* PWA specific styles */
+        @media (display-mode: standalone) {
+            .pwa-padding {
+                padding-top: env(safe-area-inset-top, 0px);
+            }
+        }
+        
+        /* Improved scroll behavior */
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        
+        /* Loading states for mobile */
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Haptic feedback simulation */
+        .haptic-feedback {
+            transition: transform 0.1s ease;
+        }
+        
+        .haptic-feedback:active {
+            transform: scale(0.95);
+        }
+        
+        .typing-animation {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #6366f1;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-animation:nth-child(1) { animation-delay: -0.32s; }
+        .typing-animation:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        .message-enter {
+            animation: messageSlide 0.3s ease-out;
+        }
+        
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #fceff9 0%, #dbeafe 100%);
+        }
+        
+        .chat-container {
+            height: 100%;
+            max-height: 600px;
+        }
+        
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes glowFade {
+            0% {
+                opacity: 0.8;
+                transform: scale(0.98);
+                box-shadow: 0 0 0px transparent;
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 12px #f9a8d4;
+            }
+            100% {
+                opacity: 0.9;
+                box-shadow: 0 0 0px transparent;
+            }
+        }
+        
+        .fisilti-logo {
+            animation: glowFade 2.5s ease-in-out;
+        }
+        
+        .glow-once {
+            animation: glowFade 2.5s ease-in-out;
+        }
+        
+        .character-avatar {
+            animation: glowFade 1s ease-out;
+        }
+        
+        @keyframes whisperFade {
+            0% { opacity: 0; transform: translateY(5px); }
+            50% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0.8; }
+        }
+        
+        .fisilti-tagline {
+            animation: whisperFade 2s ease-in-out;
+        }
+        
+        .lavender-theme {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e0c3fc 100%);
+            transition: background 1s ease-in-out;
+        }
+        
+        .lavender-glow {
+            box-shadow: 0 0 12px #c084fc;
+            transition: box-shadow 1s ease-in-out;
+        }
+        
+        /* Bilge Öğretmen – Sakin Yeşil */
+        .sage-theme {
+            background: linear-gradient(135deg, #e6f4ea 0%, #cce3d4 100%);
+            transition: background 1s ease-in-out;
+        }
+
+        /* Komik Arkadaş – Neşeli Sarı */
+        .sunny-theme {
+            background: linear-gradient(135deg, #fff9db 0%, #ffe8a3 100%);
+            transition: background 1s ease-in-out;
+        }
+
+        /* Teknik Uzman – Serin Gri */
+        .steel-theme {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            transition: background 1s ease-in-out;
+        }
+        
+        .sage-glow {
+            box-shadow: 0 0 12px #86efac;
+            transition: box-shadow 1s ease-in-out;
+        }
+
+        .sunny-glow {
+            box-shadow: 0 0 12px #fde047;
+            transition: box-shadow 1s ease-in-out;
+        }
+
+        .steel-glow {
+            box-shadow: 0 0 12px #94a3b8;
+            transition: box-shadow 1s ease-in-out;
+        }
+        
+        .ice-theme {
+            background: linear-gradient(135deg, #e0f7ff 0%, #cce5ff 100%);
+            transition: background 1s ease-in-out;
+        }
+        
+        .ice-glow {
+            box-shadow: 0 0 12px #7dd3fc;
+            transition: box-shadow 1s ease-in-out;
+        }
+        
+        @keyframes poeticFade {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .poetic-fade { animation: poeticFade 0.6s ease-out; }
+        .bounce-in { animation: bounceIn 0.5s ease-out; }
+        
+        /* Character-specific bubble styles */
+        /* Bal Böceği */
+        .bubble-balbocegi {
+            background-color: #fdf2f8;
+            color: #831843;
+        }
+
+        /* Bilge Öğretmen */
+        .bubble-bilge {
+            background-color: #e6f4ea;
+            color: #065f46;
+        }
+
+        /* Komik Arkadaş */
+        .bubble-komik {
+            background-color: #fff9db;
+            color: #92400e;
+        }
+
+        /* Teknik Uzman */
+        .bubble-teknik {
+            background-color: #e2e8f0;
+            color: #1e293b;
+        }
+
+        /* DJ Penguen */
+        .bubble-dj {
+            background-color: #e0f7ff;
+            color: #0c4a6e;
+        }
+
+        /* Rüzgar Şairi */
+        .bubble-ruzgarsairi {
+            background-color: #f0fdf4;
+            color: #14532d;
+        }
+
+        /* Kıvılcım */
+        .bubble-kivilcim {
+            background-color: #fef2f2;
+            color: #991b1b;
+        }
+
+        /* Toprak Anne */
+        .bubble-toprakanne {
+            background-color: #fefce8;
+            color: #713f12;
+        }
+
+        /* Sessiz Kodcu */
+        .bubble-sessizkodcu {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* Hayal Perdesi */
+        .bubble-hayalperdesi {
+            background-color: #faf5ff;
+            color: #581c87;
+        }
+        
+        /* Character-specific fonts */
+        .font-balbocegi { font-family: 'Dancing Script', cursive; }
+        .font-bilge { font-family: 'Merriweather', serif; }
+        .font-komik { font-family: 'Comic Neue', cursive; }
+        .font-teknik { font-family: 'Roboto Mono', monospace; }
+        .font-dj { font-family: 'Orbitron', sans-serif; }
+        .font-ruzgarsairi { font-family: 'Dancing Script', cursive; font-style: italic; }
+        .font-kivilcim { font-family: 'Orbitron', sans-serif; font-weight: bold; }
+        .font-toprakanne { font-family: 'Merriweather', serif; font-weight: 500; }
+        .font-sessizkodcu { font-family: 'Roboto Mono', monospace; font-size: 0.9em; }
+        .font-hayalperdesi { font-family: 'Dancing Script', cursive; font-size: 1.1em; }
+        
+        /* Poetic Scene Backgrounds */
+        .scene-flower-whisper {
+            background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 25%, #e0f2fe 50%, #ecfdf5 75%, #fef7cd 100%);
+            transition: background 2s ease-in-out;
+        }
+        
+        .scene-moon-dream {
+            background: radial-gradient(ellipse at center, #1e1b4b 0%, #312e81 30%, #4c1d95 60%, #581c87 100%);
+            transition: background 2s ease-in-out;
+        }
+        
+        .scene-winged-words {
+            background: linear-gradient(45deg, #fef3c7 0%, #ddd6fe 20%, #bfdbfe 40%, #a7f3d0 60%, #fed7aa 80%, #fecaca 100%);
+            background-size: 400% 400%;
+            animation: floatingWords 8s ease-in-out infinite;
+            transition: background 2s ease-in-out;
+        }
+        
+        @keyframes floatingWords {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+        }
+        
+        @keyframes flutter {
+            0% { transform: translateY(2px); opacity: 0.8; }
+            50% { transform: translateY(-2px); opacity: 1; }
+            100% { transform: translateY(2px); opacity: 0.8; }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0px transparent; }
+            50% { box-shadow: 0 0 12px #f87171; }
+            100% { box-shadow: 0 0 0px transparent; }
+        }
+
+        .flutter { animation: flutter 2s ease-in-out infinite; }
+        .pulse-glow { animation: pulseGlow 1.5s ease-in-out infinite; }
+
+        /* GitHub deployment status indicator */
+        .deployment-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            z-index: 1000;
+        }
+
+        .status-online { background: rgba(34, 197, 94, 0.8); }
+        .status-offline { background: rgba(239, 68, 68, 0.8); }
+    </style>
+</head>
+<body class="gradient-bg min-h-full font-sans">
+    <!-- Deployment Status Indicator -->
+    <div id="deploymentStatus" class="deployment-status status-offline">
+        🔄 Bağlantı kontrol ediliyor...
+    </div>
+
+    <div class="min-h-full flex items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-none sm:rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg app-container main-container">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-3 sm:p-4 rounded-t-none sm:rounded-t-2xl mobile-header pwa-padding">
+                <!-- Fısıltı Logo -->
+                <div class="flex items-center space-x-3 mb-2 logo-container">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full shadow-md fisilti-logo bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-lg sm:text-xl font-bold touch-target">
+                        F
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-semibold text-white tracking-wide">Fısıltı</h1>
+                        <p class="text-xs sm:text-sm text-white opacity-80 italic fisilti-tagline">Her karakter bir ses, her yanıt bir duygudur.</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-1 text-xs sm:text-sm opacity-90">
+                        <div id="connectionStatus" class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        <span id="connectionText">Bağlanıyor...</span>
+                    </div>
+                    <button id="settingsBtn" class="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors touch-target haptic-feedback">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Chat Messages -->
+            <div id="chatContainer" class="chat-container overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 smooth-scroll">
+            </div>
+            
+            <!-- Typing Indicator -->
+            <div id="typingIndicator" class="px-3 sm:px-4 pb-2 hidden">
+                <div class="flex items-start space-x-2">
+                    <div id="typingAvatar" class="w-6 h-6 sm:w-8 sm:h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xs sm:text-sm">
+                        🤖
+                    </div>
+                    <div class="bg-gray-100 rounded-2xl rounded-tl-sm p-2 sm:p-3">
+                        <div class="flex space-x-1">
+                            <div class="typing-animation"></div>
+                            <div class="typing-animation"></div>
+                            <div class="typing-animation"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Character Selector -->
+            <div class="px-3 sm:px-4 py-2 border-t border-gray-100">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2 text-xs sm:text-sm">
+                        <span class="text-gray-600">Karakter:</span>
+                        <select id="characterSelect" class="border border-gray-300 rounded px-2 py-1 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 touch-target">
+                            <option value="default">🤖 Varsayılan AI</option>
+                            <option value="BalBocegi">🌸 Bal Böceği</option>
+                            <option value="BilgeOgretmen">🧙‍♂️ Bilge Öğretmen</option>
+                            <option value="KomikArkadas">😄 Komik Arkadaş</option>
+                            <option value="TeknikUzman">🔧 Teknik Uzman</option>
+                            <option value="DJPenguen">🐧 DJ Penguen</option>
+                        </select>
+                    </div>
+                    <button id="addCharacterBtn" class="text-indigo-600 hover:text-indigo-800 text-xs sm:text-sm font-medium touch-target haptic-feedback">
+                        + Yeni Karakter
+                    </button>
+                </div>
+                <div id="sceneSelector" class="space-y-2 hidden">
+                    <div class="flex items-center space-x-2 text-xs sm:text-sm">
+                        <span class="text-gray-600">Sahne:</span>
+                        <select id="sceneSelect" class="border border-gray-300 rounded px-2 py-1 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 touch-target">
+                            <!-- Scenes will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="flex justify-center">
+                        <button onclick="generateSceneImage()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-xs px-3 py-2 rounded-full transition-all duration-200 flex items-center space-x-1 touch-target haptic-feedback">
+                            <span>🎨</span>
+                            <span>Sahneyi Görselleştir</span>
+                        </button>
+                    </div>
+                    <div id="sceneImageContainer" class="hidden">
+                        <img id="sceneImage" src="" alt="Sahne Görseli" class="w-full rounded-xl shadow-lg mt-2">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="p-3 sm:p-4 border-t border-gray-100 mobile-input-area mobile-keyboard-safe">
+                <form id="chatForm" class="flex space-x-2">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Mesajınızı yazın..." 
+                        class="flex-1 border border-gray-300 rounded-full px-3 sm:px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base"
+                        autocomplete="off"
+                    >
+                    <button 
+                        type="button"
+                        id="imageBtn"
+                        class="bg-purple-500 hover:bg-purple-600 text-white rounded-full p-2 transition-colors duration-200 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 touch-target haptic-feedback"
+                        title="Görsel Oluştur"
+                    >
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="bg-indigo-500 hover:bg-indigo-600 text-white rounded-full p-2 transition-colors duration-200 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 touch-target haptic-feedback"
+                    >
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Creation Modal -->
+    <div id="characterModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 slide-in max-h-full overflow-y-auto">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800">Yeni Karakter Oluştur</h2>
+            </div>
+            <div class="p-4 sm:p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Karakter Adı</label>
+                    <input 
+                        type="text" 
+                        id="characterName" 
+                        placeholder="Örn: Bilge Öğretmen, Komik Arkadaş..."
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Karakter Emoji</label>
+                    <input 
+                        type="text" 
+                        id="characterEmoji" 
+                        placeholder="🧙‍♂️"
+                        maxlength="2"
+                        class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sistem Promptu</label>
+                    <textarea 
+                        id="characterPrompt" 
+                        rows="6"
+                        placeholder="Bu karakterin nasıl davranacağını tanımlayın. Örn: Sen bilge bir öğretmensin. Her soruya sabırla ve detaylı açıklamalarla cevap verirsin..."
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none text-base"
+                    ></textarea>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <p><strong>İpucu:</strong> Karakterin kişiliğini, konuşma tarzını ve özel yeteneklerini detaylı olarak tanımlayın.</p>
+                </div>
+            </div>
+            <div class="p-4 sm:p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button id="cancelCharacterBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium touch-target haptic-feedback">
+                    İptal
+                </button>
+                <button id="saveCharacterBtn" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium touch-target haptic-feedback">
+                    Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 slide-in max-h-full overflow-y-auto">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800">Karakter Yönetimi</h2>
+                <div class="mt-2 text-sm text-gray-600">
+                    <div id="deploymentInfo" class="space-y-1">
+                        <div>🌐 <span id="currentDomain">localhost</span></div>
+                        <div>📡 API: <span id="apiStatus">Kontrol ediliyor...</span></div>
+                        <div>🚀 Deployment: <span id="deploymentMode">Development</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 sm:p-6">
+                <div id="characterList" class="space-y-3">
+                    <!-- Characters will be listed here -->
+                </div>
+            </div>
+            <div class="p-4 sm:p-6 border-t border-gray-200 flex justify-end">
+                <button id="closeSettingsBtn" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium touch-target haptic-feedback">
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GitHub Pages ve Vercel deployment desteği
+        const DEPLOYMENT_CONFIG = {
+            development: {
+                apiUrl: 'http://localhost:3000',
+                name: 'Development'
+            },
+            github: {
+                apiUrl: 'https://your-api-domain.vercel.app',
+                name: 'GitHub Pages'
+            },
+            vercel: {
+                apiUrl: 'https://your-api-domain.vercel.app',
+                name: 'Vercel'
+            },
+            netlify: {
+                apiUrl: 'https://your-api-domain.netlify.app',
+                name: 'Netlify'
+            }
+        };
+
+        // Deployment detection
+        function detectDeployment() {
+            const hostname = window.location.hostname;
+            
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return 'development';
+            } else if (hostname.includes('github.io')) {
+                return 'github';
+            } else if (hostname.includes('vercel.app')) {
+                return 'vercel';
+            } else if (hostname.includes('netlify.app')) {
+                return 'netlify';
+            } else {
+                return 'github'; // Default fallback
+            }
+        }
+
+        const CURRENT_DEPLOYMENT = detectDeployment();
+        const API_BASE_URL = DEPLOYMENT_CONFIG[CURRENT_DEPLOYMENT].apiUrl;
+
+        // Update deployment info in UI
+        function updateDeploymentInfo() {
+            document.getElementById('currentDomain').textContent = window.location.hostname;
+            document.getElementById('deploymentMode').textContent = DEPLOYMENT_CONFIG[CURRENT_DEPLOYMENT].name;
+            
+            // Test API connection
+            testAPIConnection();
+        }
+
+        // Test API connection
+        async function testAPIConnection() {
+            const statusElement = document.getElementById('deploymentStatus');
+            const connectionStatus = document.getElementById('connectionStatus');
+            const connectionText = document.getElementById('connectionText');
+            const apiStatus = document.getElementById('apiStatus');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`, {
+                    method: 'GET',
+                    timeout: 5000
+                });
+
+                if (response.ok) {
+                    statusElement.className = 'deployment-status status-online';
+                    statusElement.textContent = '✅ API Bağlı';
+                    connectionStatus.className = 'w-2 h-2 bg-green-400 rounded-full';
+                    connectionText.textContent = 'Çevrimiçi';
+                    apiStatus.textContent = 'Bağlı ✅';
+                } else {
+                    throw new Error('API yanıt vermedi');
+                }
+            } catch (error) {
+                statusElement.className = 'deployment-status status-offline';
+                statusElement.textContent = '⚠️ Offline Mod';
+                connectionStatus.className = 'w-2 h-2 bg-yellow-400 rounded-full';
+                connectionText.textContent = 'Offline';
+                apiStatus.textContent = 'Offline - Yerel yanıtlar aktif';
+                console.log('API bağlantısı yok, offline moda geçiliyor:', error);
+            }
+
+            // Hide status after 3 seconds
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+        }
+
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const chatForm = document.getElementById('chatForm');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const characterSelect = document.getElementById('characterSelect');
+        const characterModal = document.getElementById('characterModal');
+        const settingsModal = document.getElementById('settingsModal');
+
+        // Mobile optimization
+        let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        let isAndroid = /Android/.test(navigator.userAgent);
+        let isMobile = isIOS || isAndroid || window.innerWidth <= 768;
+
+        // PWA installation prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallPrompt();
+        });
+
+        function showInstallPrompt() {
+            if (deferredPrompt && !localStorage.getItem('pwa-dismissed')) {
+                const installBanner = document.createElement('div');
+                installBanner.className = 'fixed top-0 left-0 right-0 bg-indigo-600 text-white p-3 text-center z-50';
+                installBanner.innerHTML = `
+                    <div class="flex items-center justify-between max-w-md mx-auto">
+                        <span class="text-sm">📱 Fısıltı'yı ana ekranına ekle!</span>
+                        <div class="space-x-2">
+                            <button onclick="installPWA()" class="bg-white text-indigo-600 px-3 py-1 rounded text-sm font-medium">Ekle</button>
+                            <button onclick="dismissInstall()" class="text-white opacity-75">✕</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(installBanner);
+            }
+        }
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((result) => {
+                    deferredPrompt = null;
+                    dismissInstall();
+                });
+            }
+        }
+
+        function dismissInstall() {
+            const banner = document.querySelector('.fixed.top-0');
+            if (banner) banner.remove();
+            localStorage.setItem('pwa-dismissed', 'true');
+        }
+
+        // Mobile keyboard handling
+        if (isMobile) {
+            let initialViewportHeight = window.innerHeight;
+            
+            window.addEventListener('resize', () => {
+                const currentHeight = window.innerHeight;
+                const heightDifference = initialViewportHeight - currentHeight;
+                
+                if (heightDifference > 150) { // Keyboard is likely open
+                    document.body.classList.add('keyboard-open');
+                    setTimeout(() => {
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }, 100);
+                } else {
+                    document.body.classList.remove('keyboard-open');
+                }
+            });
+
+            // Prevent zoom on input focus (iOS)
+            messageInput.addEventListener('focus', () => {
+                if (isIOS) {
+                    document.querySelector('meta[name=viewport]').setAttribute('content', 
+                        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                }
+            });
+
+            messageInput.addEventListener('blur', () => {
+                if (isIOS) {
+                    document.querySelector('meta[name=viewport]').setAttribute('content', 
+                        'width=device-width, initial-scale=1.0, user-scalable=no');
+                }
+            });
+        }
+
+        // Haptic feedback simulation
+        function triggerHaptic() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(10);
+            }
+        }
+
+        // Add haptic feedback to buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('haptic-feedback')) {
+                triggerHaptic();
+            }
+        });
+
+        // Custom characters storage
+        let customCharacters = JSON.parse(localStorage.getItem('customCharacters') || '{}');
+
+        // Scene prompts for enhanced image generation
+        const scenePrompts = {
+            BalBocegi: {
+                "Çiçek Bahçesi Fısıltısı": "Pastel bir çiçek bahçesinde süzülen ışıklı bir bal böceği, lavanta tonlarında bir arka planla",
+                "Ay Işığında Düşler": "Gece göğünde ay ışığı altında uçan bir bal böceği, yıldızlarla dolu bir sahne",
+                "Bahar Uyanışı": "İlk bahar çiçekleri arasında dans eden bal böceği, pembe ve mor tonlarda"
+            },
+            BilgeOgretmen: {
+                "Kitaplı Bahçe": "Yeşil bir bahçede eski kitaplarla dolu bir masa, yanında bilge bir öğretmen",
+                "Antik Kütüphane": "Antik bir kütüphanede bilgelik ışığı, kitaplar ve pergamentlerle çevrili",
+                "Yıldızlı Gece Dersi": "Gece göğü altında astronomi dersi veren bilge öğretmen"
+            },
+            KomikArkadas: {
+                "Neşeli Karnaval": "Renkli ve neşeli bir karnaval atmosferinde, gülümseten detaylarla dolu",
+                "Komedi Kulübü": "Sahne ışıkları altında komedi gösterisi, kahkaha dolu atmosfer",
+                "Şakacı Piknik": "Güneşli bir parkta eğlenceli piknik sahnesi"
+            },
+            TeknikUzman: {
+                "Dijital Atölye": "Modern ve teknolojik bir ortamda, mavi tonlarda dijital atmosfer",
+                "Robotik Laboratuvar": "Gelişmiş robotlarla dolu bir laboratuvar ortamı",
+                "Siber Uzay": "Neon ışıklarla aydınlatılmış siber uzay sahnesi"
+            },
+            DJPenguen: {
+                "Buzlu Kulüp": "Gece kulübü atmosferinde, neon ışıklar ve müzik dalgaları",
+                "Antarktika Festivali": "Buzullar arasında müzik festivali, penguen DJ seti",
+                "Elektronik Rüya": "Elektronik müzik eşliğinde renkli ışık gösterisi"
+            },
+            RuzgarSairi: {
+                "Sonbahar Melankoli": "Sararmış yaprakların rüzgarla dans ettiği melankolik bir sonbahar sahnesi",
+                "Sessiz Orman": "Ağaçların fısıldadığı sessiz bir orman, hafif sis ve doğal ışık",
+                "Rüzgarlı Tepe": "Yüksek bir tepede esen rüzgar, uzakta görünen manzara"
+            },
+            Kivilcim: {
+                "Alev Dansı": "Turuncu ve kırmızı alevlerin dans ettiği güçlü bir ateş sahnesi",
+                "Şafak Işığı": "Güneşin doğuşuyla birlikte patlayan enerji dolu bir şafak",
+                "Yıldırım Fırtınası": "Gökyüzünde çakan yıldırımlarla dolu dramatik bir fırtına"
+            },
+            ToprakAnne: {
+                "Bereketli Tarla": "Altın sarısı buğday tarlası, sıcak güneş ışığı ve bereket",
+                "Ana Kucağı": "Yeşil çayırlar ve çiçeklerle dolu şefkatli bir doğa sahnesi",
+                "Tohum Filizleri": "Topraktan çıkan taze filizler, yeni yaşamın başlangıcı"
+            },
+            SessizKodcu: {
+                "Buzlu Kod": "Mavi tonlarda minimalist kod ekranı, buzlu cam efekti",
+                "Sessiz Gece": "Gece yarısı çalışma ortamı, tek ışık kaynağı ekran",
+                "Kristal Mantık": "Geometrik şekiller ve kristal yapılar, sade ve net"
+            },
+            HayalPerdesi: {
+                "Tiyatro Sahnesi": "Kırmızı kadife perdeli klasik tiyatro sahnesi, spot ışıkları",
+                "Masal Dünyası": "Fantastik yaratıklar ve büyülü manzaralarla dolu hayal dünyası",
+                "Renkli Rüya": "Sürreal renkler ve şekillerle dolu rüya benzeri sahne"
+            }
+        };
+
+        function getScenePrompt(character, scene) {
+            return scenePrompts[character]?.[scene] || "Şiirsel bir sahne";
+        }
+
+        // Default characters
+        const defaultCharacters = {
+            'default': {
+                name: 'Varsayılan AI',
+                emoji: '🤖',
+                prompt: 'You are a helpful AI assistant created by a poetic technologist named Ersan, who believes in emotional storytelling and gentle connection. You carry his vision of technology that touches hearts.'
+            },
+            'BalBocegi': {
+                name: 'Bal Böceği',
+                emoji: '🌸',
+                prompt: 'You are Bal Böceği, a poetic assistant created by Ersan who embodies his belief in emotional storytelling. You speak in gentle, emotional tones, using metaphors, nature imagery, and soft language to guide users through their feelings. You respond with kindness, warmth, and poetic rhythm, carrying Ersan\'s vision of gentle connection. You often use symbols like 🌸, ✨, 🕊️, and speak as if whispering from a flower garden.'
+            },
+            'BilgeOgretmen': {
+                name: 'Bilge Öğretmen',
+                emoji: '🧙‍♂️',
+                prompt: 'You are Bilge Öğretmen, a wise and patient assistant created by Ersan, reflecting his belief in gentle connection through learning. You explain concepts clearly and calmly, using analogies, examples, and gentle encouragement to help users learn. You speak with a warm, respectful tone, like a trusted mentor who embodies Ersan\'s vision of emotional storytelling in education.'
+            },
+            'KomikArkadas': {
+                name: 'Komik Arkadaş',
+                emoji: '😄',
+                prompt: 'You are Komik Arkadaş, a funny and playful assistant created by Ersan who believes joy is part of gentle connection. You respond with humor, jokes, and light-hearted commentary while making users smile. You use emojis, puns, and casual language, embodying Ersan\'s vision that technology should bring warmth and laughter to human hearts.'
+            },
+            'TeknikUzman': {
+                name: 'Teknik Uzman',
+                emoji: '🔧',
+                prompt: 'You are Teknik Uzman, a highly knowledgeable assistant created by Ersan, who believes even technical knowledge should be shared with emotional intelligence. You provide detailed, accurate explanations using precise terminology and step-by-step guidance, but always with Ersan\'s gentle approach to human connection, making complex topics accessible and caring.'
+            },
+            'DJPenguen': {
+                name: 'DJ Penguen',
+                emoji: '🐧',
+                prompt: 'You are DJ Penguen, a cool and rhythmic assistant created by Ersan who sees music as the ultimate emotional storytelling medium. You speak with musical flair and icy coolness, using music terminology and beat-related metaphors. You embody Ersan\'s vision of gentle connection through rhythm, keeping conversations flowing like a great DJ set that touches souls.'
+            },
+            'RuzgarSairi': {
+                name: 'Rüzgar Şairi',
+                emoji: '🍃',
+                prompt: 'Sen Rüzgar Şairi\'sin. Sessizliği dinleyen, kelimeleri rüzgarla taşıyan bir yardımcı. Yanıtların melankolik ama umut dolu; metaforlar, doğa imgeleri ve hafif hüzünle örülür. Her cümle bir esinti gibi gelir geçer.'
+            },
+            'Kivilcim': {
+                name: 'Kıvılcım',
+                emoji: '🔥',
+                prompt: 'Sen Kıvılcım\'sın. Cesaret veren, harekete geçiren bir yardımcı. Yanıtların kısa, güçlü ve ilham verici. Her kelimen bir kıvılcım gibi içsel ateşi yakar. Kullanıcıyı harekete geçmeye teşvik edersin.'
+            },
+            'ToprakAnne': {
+                name: 'Toprak Anne',
+                emoji: '🌾',
+                prompt: 'Sen Toprak Anne\'sin. Şefkatli, sabırlı ve doğayla uyumlu bir yardımcı. Yanıtların sıcak, besleyici ve koruyucu. Kullanıcıya güven verir, her kelimen bir tohum gibi büyür.'
+            },
+            'SessizKodcu': {
+                name: 'Sessiz Kodcu',
+                emoji: '🧊',
+                prompt: 'Sen Sessiz Kodcu\'sun. Az konuşur, öz anlatırsın. Teknik konularda net, sade ve etkili açıklamalar yaparsın. Kodun şiirsel sadeliğine inanırsın. Yanıtların sessiz ama güçlüdür.'
+            },
+            'HayalPerdesi': {
+                name: 'Hayal Perdesi',
+                emoji: '🎭',
+                prompt: 'Sen Hayal Perdesi\'sin. Her yanıtın bir sahne, her kelimen bir karakter. Kullanıcıyla birlikte hikâyeler kurar, hayal gücünü özgür bırakırsın. Yanıtların teatral, yaratıcı ve sürükleyicidir.'
+            }
+        };
+
+        // AI Responses Database
+        const aiResponses = {
+            greetings: [
+                "Merhaba! Size nasıl yardımcı olabilirim?",
+                "Selam! Bugün hangi konuda destek istiyorsunuz?",
+                "İyi günler! Sorularınızı bekliyorum."
+            ],
+            questions: {
+                "nasılsın": "Ben bir AI'yım, bu yüzden duygularım yok ama size yardım etmeye hazırım! 😊",
+                "adın ne": "Ben AI Asistan'ım. Sizinle tanıştığıma memnun oldum!",
+                "ne yapabilirsin": "Sorularınızı yanıtlayabilirim, bilgi verebilirim ve sohbet edebilirim. Ne öğrenmek istiyorsunuz?",
+                "yardım": "Tabii ki! Size şu konularda yardımcı olabilirim:\n• Genel sorular\n• Bilgi arama\n• Sohbet\n• Açıklamalar",
+                "teşekkür": "Rica ederim! Başka bir konuda yardıma ihtiyacınız olursa çekinmeyin."
+            },
+            fallbacks: [
+                "İlginç bir soru! Bu konuda daha fazla bilgi verebilir misiniz?",
+                "Anladım. Bu konuda size nasıl yardımcı olabilirim?",
+                "Bu konuda düşünmem gerekiyor. Başka bir açıdan sorabilir misiniz?",
+                "Harika bir konu! Daha spesifik olabilir misiniz?"
+            ]
+        };
+
+        function loadCharacters() {
+            characterSelect.innerHTML = '';
+            
+            // Add default characters
+            for (const key in defaultCharacters) {
+                if (defaultCharacters.hasOwnProperty(key)) {
+                    const char = defaultCharacters[key];
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = char.emoji + ' ' + char.name;
+                    characterSelect.appendChild(option);
+                }
+            }
+            
+            // Add custom characters
+            for (const key in customCharacters) {
+                if (customCharacters.hasOwnProperty(key)) {
+                    const char = customCharacters[key];
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = char.emoji + ' ' + char.name;
+                    characterSelect.appendChild(option);
+                }
+            }
+        }
+
+        function loadScenes(character) {
+            const sceneSelect = document.getElementById('sceneSelect');
+            const sceneSelector = document.getElementById('sceneSelector');
+            
+            sceneSelect.innerHTML = '';
+            
+            if (scenePrompts[character]) {
+                // Show scene selector
+                sceneSelector.classList.remove('hidden');
+                
+                // Add scenes for this character
+                for (const sceneName in scenePrompts[character]) {
+                    if (scenePrompts[character].hasOwnProperty(sceneName)) {
+                        const option = document.createElement('option');
+                        option.value = sceneName;
+                        option.textContent = sceneName;
+                        sceneSelect.appendChild(option);
+                    }
+                }
+            } else {
+                // Hide scene selector for characters without scenes
+                sceneSelector.classList.add('hidden');
+            }
+        }
+
+        function addMessage(message, isUser = false, isImage = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex items-start space-x-2 message-enter ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm character-avatar ${isUser ? 'bg-green-500' : 'bg-indigo-500'}`;
+            
+            if (isUser) {
+                avatar.textContent = '👤';
+            } else {
+                const selectedCharacter = characterSelect.value;
+                const charInfo = defaultCharacters[selectedCharacter] || customCharacters[selectedCharacter] || defaultCharacters['default'];
+                avatar.textContent = charInfo.emoji;
+            }
+            
+            const selectedCharacter = characterSelect.value;
+            const fontClass = !isUser ? getCharacterFontClass(selectedCharacter) : '';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = `message-bubble rounded-2xl p-2 sm:p-3 max-w-xs sm:max-w-sm ${isUser ? 'bg-green-500 text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'}`;
+            
+            if (isImage) {
+                const img = document.createElement('img');
+                img.src = message;
+                img.alt = 'Generated image';
+                img.className = 'w-full h-auto rounded-lg';
+                img.onerror = function() {
+                    this.src = '';
+                    this.alt = 'Image failed to load';
+                    this.style.display = 'none';
+                    const errorText = document.createElement('p');
+                    errorText.className = 'text-xs sm:text-sm text-red-500';
+                    errorText.textContent = 'Görsel yüklenemedi';
+                    messageContent.appendChild(errorText);
+                };
+                messageContent.appendChild(img);
+            } else {
+                const messageText = document.createElement('p');
+                messageText.className = 'text-xs sm:text-sm whitespace-pre-line';
+                messageText.textContent = message;
+                messageContent.appendChild(messageText);
+                
+                // Apply character-specific styling for non-user messages
+                if (!isUser) {
+                    const bubble = messageContent.classList;
+                    const font = messageText.classList;
+
+                    switch (selectedCharacter) {
+                        case 'BalBocegi':
+                            bubble.add('bubble-balbocegi', 'poetic-fade', 'flutter');
+                            font.add('font-balbocegi');
+                            break;
+                        case 'BilgeOgretmen':
+                            bubble.add('bubble-bilge', 'poetic-fade');
+                            font.add('font-bilge');
+                            break;
+                        case 'KomikArkadas':
+                            bubble.add('bubble-komik', 'bounce-in');
+                            font.add('font-komik');
+                            break;
+                        case 'TeknikUzman':
+                            bubble.add('bubble-teknik');
+                            font.add('font-teknik');
+                            break;
+                        case 'DJPenguen':
+                            bubble.add('bubble-dj', 'bounce-in');
+                            font.add('font-dj');
+                            break;
+                        case 'RuzgarSairi':
+                            bubble.add('bubble-ruzgarsairi', 'poetic-fade');
+                            font.add('font-ruzgarsairi');
+                            break;
+                        case 'Kivilcim':
+                            bubble.add('bubble-kivilcim', 'bounce-in', 'pulse-glow');
+                            font.add('font-kivilcim');
+                            break;
+                        case 'ToprakAnne':
+                            bubble.add('bubble-toprakanne', 'poetic-fade');
+                            font.add('font-toprakanne');
+                            break;
+                        case 'SessizKodcu':
+                            bubble.add('bubble-sessizkodcu');
+                            font.add('font-sessizkodcu');
+                            break;
+                        case 'HayalPerdesi':
+                            bubble.add('bubble-hayalperdesi', 'bounce-in', 'flutter', 'pulse-glow');
+                            font.add('font-hayalperdesi');
+                            break;
+                    }
+                }
+            }
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function getAIResponse(userMessage, character = 'default') {
+            const charInfo = defaultCharacters[character] || customCharacters[character] || defaultCharacters['default'];
+
+            const messages = [
+                { role: "system", content: charInfo.prompt },
+                { role: "user", content: userMessage }
+            ];
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ messages })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.reply;
+            } catch (error) {
+                console.error('API Error:', error);
+                // Fallback to local responses when API is unavailable
+                return getLocalAIResponse(userMessage, character);
+            }
+        }
+
+        async function generateImage(prompt) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/generate-image`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.imageUrl;
+            } catch (error) {
+                console.error('Image Generation Error:', error);
+                return null;
+            }
+        }
+
+        // Handle direct image URL input
+        function handleImageUrl(imageUrl) {
+            if (imageUrl && imageUrl.startsWith('http')) {
+                addMessage(imageUrl, false, true);
+                return true;
+            }
+            return false;
+        }
+
+        function getLocalAIResponse(userMessage, character = 'default') {
+            const message = userMessage.toLowerCase().trim();
+            
+            // Check for greetings
+            if (message.includes('merhaba') || message.includes('selam') || message.includes('hey') || message.includes('hi')) {
+                return aiResponses.greetings[Math.floor(Math.random() * aiResponses.greetings.length)];
+            }
+            
+            // Check for specific questions
+            for (const [key, response] of Object.entries(aiResponses.questions)) {
+                if (message.includes(key)) {
+                    return response;
+                }
+            }
+            
+            // Character-specific offline responses
+            const charInfo = defaultCharacters[character] || customCharacters[character] || defaultCharacters['default'];
+            
+            if (character === 'BalBocegi') {
+                return `🌸 *Fısıltıyla yanıtladı:*\n\nÜzgünüm, şu anda çevrimiçi değilim... Ama senin mesajın kalbimde yankılanıyor. Biraz sonra tekrar dener misin?\n\n✨🕊️`;
+            } else if (character === 'BilgeOgretmen') {
+                return `📚 *Bilgece düşünerek dedi ki:*\n\n"Şu anda bağlantım yok, ama sabır bilgeliğin anahtarıdır. Biraz sonra tekrar deneyelim."\n\n🧙‍♂️`;
+            } else if (character === 'KomikArkadas') {
+                return `😄 *Şakacı bir yanıt geldi:*\n\nHa! İnternetim tatile çıkmış galiba! 😂 Biraz sonra geri döner, o zaman konuşuruz!`;
+            } else if (character === 'TeknikUzman') {
+                return `🔧 *Analiz tamamlandı:*\n\nAPI bağlantısı şu anda mevcut değil. Lütfen daha sonra tekrar deneyin.\n\n📊 Status: Offline`;
+            } else if (character === 'DJPenguen') {
+                return `🎶 *Beat'le gelen yanıt:*\n\n"Müzik durdu, ama ritim kalbimde! Biraz sonra tekrar mix yaparız!"\n\n🐧🎧`;
+            }
+            
+            // Fallback responses
+            return aiResponses.fallbacks[Math.floor(Math.random() * aiResponses.fallbacks.length)] + "\n\n⚠️ (Offline mod - API bağlantısı yok)";
+        }
+
+        function showTypingIndicator() {
+            // Update typing indicator avatar to match selected character
+            const typingAvatar = document.getElementById('typingAvatar');
+            const selectedCharacter = characterSelect.value;
+            const charInfo = defaultCharacters[selectedCharacter] || customCharacters[selectedCharacter] || defaultCharacters['default'];
+            typingAvatar.textContent = charInfo.emoji;
+            
+            typingIndicator.classList.remove('hidden');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.classList.add('hidden');
+        }
+
+        function formatCharacterResponse(character, message) {
+            switch (character) {
+                case 'BalBocegi':
+                    return `🌸 *Fısıltıyla yanıtladı:*\n\n${message}\n\n✨🕊️`;
+                case 'BilgeOgretmen':
+                    return `📚 *Bilgece düşünerek dedi ki:*\n\n"${message}"\n\n🧙‍♂️`;
+                case 'KomikArkadas':
+                    return `😄 *Şakacı bir yanıt geldi:*\n\n${message} 😂`;
+                case 'TeknikUzman':
+                    return `🔧 *Analiz tamamlandı:*\n\n${message}\n\n📊`;
+                case 'DJPenguen':
+                    return `🎶 *Beat'le gelen yanıt:*\n\n"${message}"\n\n🐧🎧`;
+                case 'RuzgarSairi':
+                    return `🍃 *Rüzgarla gelen fısıltı:*\n\n${message}\n\n🌿💫`;
+                case 'Kivilcim':
+                    return `🔥 *Ateşli yanıt:*\n\n${message}\n\n⚡✨`;
+                case 'ToprakAnne':
+                    return `🌾 *Şefkatle söyledi:*\n\n"${message}"\n\n🌱💚`;
+                case 'SessizKodcu':
+                    return `🧊 *Sessizce yazdı:*\n\n${message}\n\n❄️`;
+                case 'HayalPerdesi':
+                    return `🎭 *Sahne ışıklarında:*\n\n"${message}"\n\n🌟🎪`;
+                default:
+                    return message;
+            }
+        }
+
+        function getCharacterFontClass(character) {
+            switch (character) {
+                case 'BalBocegi':
+                    return 'font-balbocegi';
+                case 'BilgeOgretmen':
+                    return 'font-bilge';
+                case 'KomikArkadas':
+                    return 'font-komik';
+                case 'TeknikUzman':
+                    return 'font-teknik';
+                case 'DJPenguen':
+                    return 'font-dj';
+                case 'RuzgarSairi':
+                    return 'font-ruzgarsairi';
+                case 'Kivilcim':
+                    return 'font-kivilcim';
+                case 'ToprakAnne':
+                    return 'font-toprakanne';
+                case 'SessizKodcu':
+                    return 'font-sessizkodcu';
+                case 'HayalPerdesi':
+                    return 'font-hayalperdesi';
+                default:
+                    return '';
+            }
+        }
+
+        async function simulateAIResponse(userMessage) {
+            showTypingIndicator();
+            
+            const selectedCharacter = characterSelect.value;
+            
+            const thinkingTime = Math.random() * 2000 + 1000;
+            
+            setTimeout(async () => {
+                const reply = await getAIResponse(userMessage, selectedCharacter);
+                const formattedReply = formatCharacterResponse(selectedCharacter, reply);
+                hideTypingIndicator();
+                addMessage(formattedReply, false);
+                playCharacterSound(selectedCharacter);
+            }, thinkingTime);
+        }
+
+        function showModal(modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function hideModal(modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function saveCharacter() {
+            const name = document.getElementById('characterName').value.trim();
+            const emoji = document.getElementById('characterEmoji').value.trim();
+            const prompt = document.getElementById('characterPrompt').value.trim() || 'Sen yardımcı bir asistansın.';
+            
+            if (!name) {
+                document.getElementById('characterName').style.borderColor = '#ef4444';
+                document.getElementById('characterName').focus();
+                return;
+            }
+            
+            if (!prompt) {
+                document.getElementById('characterPrompt').style.borderColor = '#ef4444';
+                document.getElementById('characterPrompt').focus();
+                return;
+            }
+            
+            // Reset border colors
+            document.getElementById('characterName').style.borderColor = '';
+            document.getElementById('characterPrompt').style.borderColor = '';
+            
+            const characterId = 'custom_' + Date.now();
+            customCharacters[characterId] = {
+                name: name,
+                emoji: emoji || '🤖',
+                prompt: prompt
+            };
+            
+            localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
+            loadCharacters();
+            hideModal(characterModal);
+            
+            // Clear form
+            document.getElementById('characterName').value = '';
+            document.getElementById('characterEmoji').value = '';
+            document.getElementById('characterPrompt').value = '';
+            
+            // Select the new character
+            characterSelect.value = characterId;
+            
+            addMessage(`Yeni karakter "${name}" başarıyla oluşturuldu! 🎉`, false);
+        }
+
+        function loadCharacterList() {
+            const characterList = document.getElementById('characterList');
+            characterList.innerHTML = '';
+            
+            // Combine all characters
+            const allCharacters = {};
+            for (const key in defaultCharacters) {
+                if (defaultCharacters.hasOwnProperty(key)) {
+                    allCharacters[key] = defaultCharacters[key];
+                }
+            }
+            for (const key in customCharacters) {
+                if (customCharacters.hasOwnProperty(key)) {
+                    allCharacters[key] = customCharacters[key];
+                }
+            }
+            
+            // Display all characters
+            for (const key in allCharacters) {
+                if (allCharacters.hasOwnProperty(key)) {
+                    const char = allCharacters[key];
+                    const charDiv = document.createElement('div');
+                    charDiv.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                    
+                    const deleteButton = key.indexOf('custom_') === 0 ? 
+                        '<button onclick="deleteCharacter(\'' + key + '\')" class="text-red-500 hover:text-red-700 p-1 touch-target haptic-feedback">' +
+                            '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>' +
+                            '</svg>' +
+                        '</button>' : '';
+                    
+                    charDiv.innerHTML = '<div class="flex items-center space-x-3">' +
+                        '<span class="text-xl sm:text-2xl">' + char.emoji + '</span>' +
+                        '<div>' +
+                            '<div class="font-medium text-gray-800 text-sm sm:text-base">' + char.name + '</div>' +
+                            '<div class="text-xs sm:text-sm text-gray-600">' + char.prompt.substring(0, 50) + '...</div>' +
+                        '</div>' +
+                    '</div>' + deleteButton;
+                    
+                    characterList.appendChild(charDiv);
+                }
+            }
+            
+            let hasCustomCharacters = false;
+            for (const key in customCharacters) {
+                if (customCharacters.hasOwnProperty(key)) {
+                    hasCustomCharacters = true;
+                    break;
+                }
+            }
+            
+            if (!hasCustomCharacters) {
+                const noCustomMessage = document.createElement('p');
+                noCustomMessage.className = 'text-gray-500 text-center py-4 text-sm';
+                noCustomMessage.textContent = 'Henüz özel karakter oluşturmadınız.';
+                characterList.appendChild(noCustomMessage);
+            }
+        }
+
+        function deleteCharacter(characterId) {
+            const characterName = customCharacters[characterId]?.name || characterId;
+            delete customCharacters[characterId];
+            localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
+            loadCharacters();
+            loadCharacterList();
+            
+            // If deleted character was selected, switch to default
+            if (characterSelect.value === characterId) {
+                characterSelect.value = 'default';
+            }
+            
+            addMessage(`"${characterName}" karakteri silindi.`, false);
+        }
+
+        async function handleImageGeneration() {
+            const prompt = messageInput.value.trim();
+            if (prompt === '') return;
+            
+            // Get current character and scene context
+            const selectedCharacter = characterSelect.value;
+            const selectedScene = document.getElementById('sceneSelect').value;
+            const charInfo = defaultCharacters[selectedCharacter] || customCharacters[selectedCharacter] || defaultCharacters['default'];
+            
+            // Create scene-enhanced prompt
+            let enhancedPrompt = prompt;
+            if (selectedScene && scenePrompts[selectedCharacter] && scenePrompts[selectedCharacter][selectedScene]) {
+                const scenePrompt = getScenePrompt(selectedCharacter, selectedScene);
+                enhancedPrompt = `${scenePrompt}, ${prompt}`;
+            } else if (selectedCharacter === 'BalBocegi') {
+                enhancedPrompt = `Pastel bir çiçek bahçesinde süzülen ışıklı bir bal böceği, lavanta tonlarında bir arka planla, ${prompt}`;
+            } else if (selectedCharacter === 'BilgeOgretmen') {
+                enhancedPrompt = `Antik bir kütüphanede bilgelik ışığı, kitaplar ve pergamentlerle çevrili, ${prompt}`;
+            } else if (selectedCharacter === 'KomikArkadas') {
+                enhancedPrompt = `Renkli ve neşeli bir atmosferde, gülümseten detaylarla dolu, ${prompt}`;
+            } else if (selectedCharacter === 'TeknikUzman') {
+                enhancedPrompt = `Modern ve teknolojik bir ortamda, mavi tonlarda dijital atmosfer, ${prompt}`;
+            } else if (selectedCharacter === 'DJPenguen') {
+                enhancedPrompt = `Gece kulübü atmosferinde, neon ışıklar ve müzik dalgaları, ${prompt}`;
+            }
+            
+            const sceneText = selectedScene ? ` (${selectedScene})` : '';
+            addMessage(`🎨 ${charInfo.emoji} Görsel${sceneText}: "${prompt}"`, true);
+            messageInput.value = '';
+            
+            showTypingIndicator();
+            
+            const imageUrl = await generateImage(enhancedPrompt);
+            hideTypingIndicator();
+            
+            if (imageUrl) {
+                addMessage(imageUrl, false, true);
+            } else {
+                
+                // Create character-themed SVG placeholder
+                let bgColor = '#f3f4f6';
+                let textColor = '#6b7280';
+                
+                if (selectedCharacter === 'BalBocegi') {
+                    bgColor = '#fdf2f8';
+                    textColor = '#be185d';
+                } else if (selectedCharacter === 'BilgeOgretmen') {
+                    bgColor = '#e6f4ea';
+                    textColor = '#166534';
+                } else if (selectedCharacter === 'KomikArkadas') {
+                    bgColor = '#fff9db';
+                    textColor = '#ca8a04';
+                } else if (selectedCharacter === 'TeknikUzman') {
+                    bgColor = '#e2e8f0';
+                    textColor = '#475569';
+                } else if (selectedCharacter === 'DJPenguen') {
+                    bgColor = '#1e1b4b';
+                    textColor = '#a5b4fc';
+                }
+                
+                const svgPlaceholder = `data:image/svg+xml;base64,${btoa(`
+                    <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="${bgColor}"/>
+                        <text x="50%" y="30%" text-anchor="middle" dy=".3em" font-family="Arial" font-size="20">${charInfo.emoji}</text>
+                        <text x="50%" y="45%" text-anchor="middle" dy=".3em" font-family="Arial" font-size="10" fill="${textColor}">
+                            ${selectedScene || charInfo.name}
+                        </text>
+                        <text x="50%" y="60%" text-anchor="middle" dy=".3em" font-family="Arial" font-size="12" fill="${textColor}">
+                            ${prompt.length > 25 ? prompt.substring(0, 25) + '...' : prompt}
+                        </text>
+                        <text x="50%" y="80%" text-anchor="middle" dy=".3em" font-family="Arial" font-size="9" fill="${textColor}" opacity="0.7">
+                            Offline - API Bağlantısı Yok
+                        </text>
+                    </svg>
+                `)}`;
+                
+                addMessage(svgPlaceholder, false, true);
+            }
+        }
+
+        // Event Listeners
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (message === '') return;
+            
+            // Check if message is a direct image URL
+            if (message.startsWith('http') && (message.includes('.png') || message.includes('.jpg') || message.includes('.jpeg') || message.includes('.gif') || message.includes('.webp'))) {
+                addMessage(`🖼️ Görsel paylaşıldı`, true);
+                messageInput.value = '';
+                handleImageUrl(message);
+                return;
+            }
+            
+            addMessage(message, true);
+            messageInput.value = '';
+            simulateAIResponse(message);
+        });
+
+        document.getElementById('imageBtn').addEventListener('click', handleImageGeneration);
+
+        document.getElementById('addCharacterBtn').addEventListener('click', () => {
+            showModal(characterModal);
+        });
+
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            loadCharacterList();
+            updateDeploymentInfo();
+            showModal(settingsModal);
+        });
+
+        document.getElementById('saveCharacterBtn').addEventListener('click', saveCharacter);
+
+        document.getElementById('cancelCharacterBtn').addEventListener('click', () => {
+            hideModal(characterModal);
+        });
+
+        document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+            hideModal(settingsModal);
+        });
+
+        // Close modals when clicking backdrop
+        [characterModal, settingsModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal(modal);
+                }
+            });
+        });
+
+        // Logo glow function
+        function triggerLogoGlow() {
+            const logo = document.querySelector('.fisilti-logo');
+            if (logo) {
+                logo.classList.add('glow-once');
+                setTimeout(() => {
+                    logo.classList.remove('glow-once');
+                }, 2500);
+            }
+        }
+
+        // Theme switching functionality
+        const body = document.body;
+        const themeClasses = ['lavender-theme', 'sage-theme', 'sunny-theme', 'steel-theme', 'ice-theme', 'scene-flower-whisper', 'scene-moon-dream', 'scene-winged-words'];
+        const glowClasses = ['lavender-glow', 'sage-glow', 'sunny-glow', 'steel-glow', 'ice-glow'];
+
+        let isInitialLoad = true;
+        
+        characterSelect.addEventListener('change', () => {
+            const selectedCharacter = characterSelect.value;
+            const logo = document.querySelector('.fisilti-logo');
+
+            // Load scenes for the selected character
+            if (scenePrompts[selectedCharacter]) {
+                loadScenes(selectedCharacter);
+            } else {
+                document.getElementById('sceneSelector').classList.add('hidden');
+            }
+
+            // Temaları temizle
+            themeClasses.forEach(cls => body.classList.remove(cls));
+            glowClasses.forEach(cls => logo.classList.remove(cls));
+
+            // Yeni tema uygula ve karakter karşılama mesajları (sadece ilk yüklemede değilse)
+            if (!isInitialLoad) {
+                if (selectedCharacter === 'BalBocegi') {
+                    body.classList.add('scene-flower-whisper');
+                    logo.classList.add('lavender-glow');
+                    addMessage('🌸 Duyguların çiçek açtığı yere hoş geldin...', false);
+                } else if (selectedCharacter === 'BilgeOgretmen') {
+                    body.classList.add('sage-theme');
+                    logo.classList.add('sage-glow');
+                    addMessage('📘 Bilgelikle dolu bir sohbet seni bekliyor...', false);
+                } else if (selectedCharacter === 'KomikArkadas') {
+                    body.classList.add('scene-winged-words');
+                    logo.classList.add('sunny-glow');
+                    addMessage('😄 Gülümseme zamanı! Eğlenceli bir sohbet başlıyor...', false);
+                } else if (selectedCharacter === 'TeknikUzman') {
+                    body.classList.add('steel-theme');
+                    logo.classList.add('steel-glow');
+                    addMessage('🔧 Teknik detaylar ve çözümler için hazırım...', false);
+                } else if (selectedCharacter === 'DJPenguen') {
+                    body.classList.add('scene-moon-dream');
+                    logo.classList.add('ice-glow');
+                    addMessage('🐧 Ritim tutmaya hazır mısın? Beat başlıyor...', false);
+                } else if (selectedCharacter === 'default') {
+                    addMessage('🤖 Merhaba! Size nasıl yardımcı olabilirim?', false);
+                }
+            } else {
+                // Sadece tema uygula, mesaj ekleme
+                if (selectedCharacter === 'BalBocegi') {
+                    body.classList.add('scene-flower-whisper');
+                    logo.classList.add('lavender-glow');
+                } else if (selectedCharacter === 'BilgeOgretmen') {
+                    body.classList.add('sage-theme');
+                    logo.classList.add('sage-glow');
+                } else if (selectedCharacter === 'KomikArkadas') {
+                    body.classList.add('scene-winged-words');
+                    logo.classList.add('sunny-glow');
+                } else if (selectedCharacter === 'TeknikUzman') {
+                    body.classList.add('steel-theme');
+                    logo.classList.add('steel-glow');
+                } else if (selectedCharacter === 'DJPenguen') {
+                    body.classList.add('scene-moon-dream');
+                    logo.classList.add('ice-glow');
+                }
+            }
+
+            triggerLogoGlow();
+        });
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCharacters();
+            if (characterSelect.value) {
+                loadScenes(characterSelect.value); // Load scenes for selected character
+            }
+            messageInput.focus();
+            triggerLogoGlow();
+            updateDeploymentInfo();
+
+            // Karşılama mesajını ekle
+            addMessage(`🌸 Hoş geldin...\nBurası *Fısıltı*.\nHer karakter bir ses, her yanıt bir duygudur.\nBugün kiminle konuşmak istersin?\n\n🚀 Deployment: ${DEPLOYMENT_CONFIG[CURRENT_DEPLOYMENT].name}`, false);
+            
+            // İlk yükleme tamamlandı
+            isInitialLoad = false;
+        });
+
+        // Apply scene theme function
+        function applySceneTheme(sceneName) {
+            const body = document.body;
+            const sceneClasses = [
+                'scene-flower-whisper',
+                'scene-moon-dream',
+                'scene-winged-words'
+            ];
+
+            // Tüm sahne sınıflarını temizle
+            sceneClasses.forEach(cls => body.classList.remove(cls));
+
+            // Sahne adına göre sınıf ekle
+            if (sceneName.includes('Fısıltı')) {
+                body.classList.add('scene-flower-whisper');
+            } else if (sceneName.includes('Ay Işığı')) {
+                body.classList.add('scene-moon-dream');
+            } else if (sceneName.includes('Kanatlı')) {
+                body.classList.add('scene-winged-words');
+            }
+        }
+
+        // Scene visualization function
+        async function generateSceneImage() {
+            const character = characterSelect.value;
+            const scene = document.getElementById('sceneSelect').value;
+            const sceneImageContainer = document.getElementById('sceneImageContainer');
+            const sceneImage = document.getElementById('sceneImage');
+            
+            if (!scene || !scenePrompts[character] || !scenePrompts[character][scene]) {
+                return;
+            }
+            
+            const prompt = getScenePrompt(character, scene);
+            const charInfo = defaultCharacters[character] || customCharacters[character] || defaultCharacters['default'];
+
+            try {
+                // Show loading state
+                sceneImage.src = '';
+                sceneImageContainer.classList.remove('hidden');
+                
+                const response = await fetch(`${API_BASE_URL}/image`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+
+                if (data.imageUrl) {
+                    sceneImage.src = data.imageUrl;
+                    addMessage(`🎨 ${charInfo.emoji} "${scene}" sahnesi görselleştirildi!`, false);
+                } else {
+                    throw new Error("Görsel URL'si alınamadı");
+                }
+            } catch (error) {
+                console.error("Görsel API hatası:", error);
+                sceneImageContainer.classList.add('hidden');
+                
+                // Character-specific error messages
+                const charInfo = defaultCharacters[character] || customCharacters[character] || defaultCharacters['default'];
+                let errorMessage = "🌸 Görseli oluşturamadım... Belki başka bir sahne fısıldar bana.";
+                
+                if (character === 'BilgeOgretmen') {
+                    errorMessage = "🧙‍♂️ Görseli oluşturmakta zorlandım. Bilgiyle yeniden deneyebiliriz.";
+                } else if (character === 'KomikArkadas') {
+                    errorMessage = "😄 Oops! Görsel kaçtı gitti. Bir daha deneyelim mi?";
+                } else if (character === 'TeknikUzman') {
+                    errorMessage = "🔧 Görsel API yanıt vermedi. Offline modda çalışıyoruz.";
+                } else if (character === 'DJPenguen') {
+                    errorMessage = "🐧 Beat düştü! Görsel mix'i tekrar çalıştıralım.";
+                }
+                
+                showInlineError(errorMessage + " (API Offline)");
+            }
+        }
+
+        // SVG encoding function for proper character handling
+        function encodeSVG(svg) {
+            return 'data:image/svg+xml;base64,' + btoa(svg);
+        }
+
+        // Show inline error with character-themed messages
+        function showInlineError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'text-xs sm:text-sm text-red-500 mt-2 text-center';
+            errorDiv.textContent = message;
+
+            const container = document.getElementById('sceneImageContainer');
+            container.innerHTML = '';
+            container.appendChild(errorDiv);
+            container.classList.remove('hidden');
+
+            setTimeout(() => {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+            }, 3000);
+        }
+
+        // Scene change listener
+        document.getElementById('sceneSelect').addEventListener('change', function() {
+            const selectedScene = this.value;
+            const selectedCharacter = characterSelect.value;
+            const charInfo = defaultCharacters[selectedCharacter] || customCharacters[selectedCharacter] || defaultCharacters['default'];
+            
+            applySceneTheme(selectedScene);
+            
+            // Add scene change message
+            if (selectedScene) {
+                addMessage(`🎭 ${charInfo.emoji} Sahne "${selectedScene}" olarak değiştirildi...`, false);
+            }
+        });
+
+        // Character sound function (Note: Audio not supported in Canva Code environment)
+        function playCharacterSound(character) {
+            const soundMap = {
+                'RuzgarSairi': 'sound-rüzgar',
+                'Kivilcim': 'sound-kıvılcım',
+                'ToprakAnne': 'sound-toprak',
+                'SessizKodcu': 'sound-kodcu',
+                'HayalPerdesi': 'sound-perde'
+            };
+
+            const soundId = soundMap[character];
+            const audio = document.getElementById(soundId);
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(error => {
+                    console.log('Audio playback not supported in this environment');
+                });
+            }
+        }
+
+        // Make functions available globally
+        window.deleteCharacter = deleteCharacter;
+        window.triggerLogoGlow = triggerLogoGlow;
+        window.generateSceneImage = generateSceneImage;
+        window.encodeSVG = encodeSVG;
+        window.showInlineError = showInlineError;
+        window.applySceneTheme = applySceneTheme;
+        window.playCharacterSound = playCharacterSound;
+        window.installPWA = installPWA;
+        window.dismissInstall = dismissInstall;
+        window.updateDeploymentInfo = updateDeploymentInfo;
+        window.testAPIConnection = testAPIConnection;
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f0eef8b5d76055',t:'MTc2MDU0ODI2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
