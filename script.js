@@ -44,3 +44,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+document.getElementById('sendButton').addEventListener('click', () => {
+  const userMessage = document.getElementById('messageInput').value;
+
+  fetch('https://ersanhar-fisilti-api.onrender.com/api/whisper', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: userMessage })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log(data);
+    // Yanıtı ekrana yazdırmak için:
+    document.getElementById('responseArea').innerText = data.reply;
+  })
+  .catch(err => console.error("API hatası:", err));
+});
