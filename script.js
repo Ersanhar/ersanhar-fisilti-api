@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendButton = document.getElementById("sendButton");
   const messageInput = document.getElementById("messageInput");
   const characterSelect = document.getElementById("characterSelect");
-  const responseBox = document.getElementById("responseBox");
+  const responseBox = document.getElementById("responseBox"); // Tek yanıt kutusu
 
   sendButton.addEventListener("click", () => {
     const userMessage = messageInput.value.trim();
@@ -13,11 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Varsayılan karakteri belirle
+    // Varsayılan karakter
     if (!selectedCharacter || selectedCharacter === "default") {
-      selectedCharacter = "BalBocegi"; // 🌸 varsayılan karakter
+      selectedCharacter = "BalBocegi"; // 🌸
     }
 
+    // API çağrısı
     fetch("https://ersanhar-fisilti-api.onrender.com/chat", {
       method: "POST",
       headers: {
@@ -43,20 +44,4 @@ document.addEventListener("DOMContentLoaded", () => {
       responseBox.innerText = "Sunucuya bağlanılamadı.";
     });
   });
-});
-document.getElementById('sendButton').addEventListener('click', () => {
-  const userMessage = document.getElementById('messageInput').value;
-
-  fetch('https://ersanhar-fisilti-api.onrender.com/api/whisper', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: userMessage })
-  })
-  .then(res => res.json())
-  .then(data => {
-    console.log(data);
-    // Yanıtı ekrana yazdırmak için:
-    document.getElementById('responseArea').innerText = data.reply;
-  })
-  .catch(err => console.error("API hatası:", err));
 });
