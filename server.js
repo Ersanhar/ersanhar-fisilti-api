@@ -58,3 +58,9 @@ app.post('/chat', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🌸 Fısıltı API Server ${PORT} portunda çalışıyor`);
 });
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
