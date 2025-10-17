@@ -26,16 +26,26 @@
       margin-left: auto;
       margin-right: auto;
     }
+    #generatedImage {
+      max-width: 100%;
+      margin-top: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
   <h1>🌸 Fısıltı</h1>
+
+  <!-- Karakter Seçimi -->
   <label for="characterSelect">Karakter Seç:</label>
   <select id="characterSelect">
     <option value="BalBocegi">🌸 Bal Böceği</option>
     <option value="MaviKarga">🦅 Mavi Karga</option>
     <option value="KumKedisi">🐱 Kum Kedisi</option>
   </select>
+
+  <!-- Mesaj Gönderme -->
   <br />
   <label for="messageInput">Mesajınız:</label>
   <input type="text" id="messageInput" placeholder="Bir şeyler yaz..." />
@@ -43,6 +53,13 @@
 
   <div id="responseBox">Yanıt burada görünecek...</div>
 
+  <!-- Görsel Üretme -->
+  <h2>🎨 Görsel Üret</h2>
+  <input type="text" id="imagePrompt" placeholder="Görsel açıklaması yaz..." />
+  <button id="generateImage">Görsel Oluştur</button>
+  <img id="generatedImage" src="" alt="Oluşturulan Görsel" />
+
+  <!-- Script -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const sendButton = document.getElementById("sendButton");
@@ -51,9 +68,9 @@
       const responseBox = document.getElementById("responseBox");
 
       const backgrounds = {
-        BalBocegi: "#fff0f5",    // Pembe ton
-        MaviKarga: "#e0f7ff",    // Mavi ton
-        KumKedisi: "#fff8e1"     // Kum ton
+        BalBocegi: "#fff0f5",
+        MaviKarga: "#e0f7ff",
+        KumKedisi: "#fff8e1"
       };
 
       characterSelect.addEventListener("change", () => {
@@ -97,6 +114,30 @@
         .catch(error => {
           console.error("Hata:", error);
           responseBox.innerText = "Sunucuya bağlanılamadı.";
+        });
+      });
+
+      // Görsel üretme
+      document.getElementById("generateImage").addEventListener("click", () => {
+        const prompt = document.getElementById("imagePrompt").value.trim();
+        if (!prompt) return;
+
+        fetch("https://ersanhar-fisilti-api.onrender.com/image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.imageUrl) {
+            document.getElementById("generatedImage").src = data.imageUrl;
+          } else {
+            alert("Görsel oluşturulamadı.");
+          }
+        })
+        .catch(err => {
+          console.error("Görsel hatası:", err);
+          alert("Sunucuya bağlanılamadı.");
         });
       });
     });
