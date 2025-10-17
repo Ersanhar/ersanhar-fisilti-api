@@ -63,4 +63,47 @@ const OpenAI = require('openai');
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+require('dotenv').config(); // .env dosyasını yükler
+
+const express = require('express');
+const cors = require('cors');
+const OpenAI = require('openai');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+const corsOptions = {
+  origin: 'https://ersanhar.github.io',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+require('dotenv').config(); // .env dosyasını yükler
+
+const express = require('express');
+const cors = require('cors');
+const OpenAI = require('openai');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+const corsOptions = {
+  origin: 'https://ersanhar.github.io',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
 
