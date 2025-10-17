@@ -6,15 +6,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   sendButton.addEventListener("click", () => {
     const userMessage = messageInput.value.trim();
-    let selectedCharacter = characterSelect.value;
+    let selectedCharacter = characterSelect?.value;
 
     if (!userMessage) {
       responseBox.innerText = "Lütfen bir mesaj yazın.";
       return;
     }
 
-    if (!selectedCharacter) {
-      selectedCharacter = "Çiçek"; // 🌸 varsayılan karakter
+    // Varsayılan karakteri belirle
+    if (!selectedCharacter || selectedCharacter === "default") {
+      selectedCharacter = "BalBocegi"; // 🌸 varsayılan karakter
     }
 
     fetch("https://ersanhar-fisilti-api.onrender.com/chat", {
