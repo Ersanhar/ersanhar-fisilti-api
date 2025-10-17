@@ -1,52 +1,84 @@
 const express = require("express");
 const cors = require("cors");
-const { OpenAI } = require("openai");
+const fetch = require("node-fetch");
 require("dotenv").config();
 
 const app = express();
+const PORT = process.env.PORT || 10000;
+
 app.use(cors());
 app.use(express.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+console.log("OpenAI anahtarı:", process.env.OPENAI_API_KEY);
 
-console.log("OpenAI anahtarı:", process.env.OPENAI_API_KEY?.slice(0, 5));
-
-const characterPrompts = {
-  BalBocegi: "Sen Bal Böceği karakterisin. Neşeli, nazik ve şiirli bir üslubun var.",
-  BilgeOgretmen: "Sen Bilge Öğretmen karakterisin. Bilgeliğinle yol gösterirsin.",
-  KomikArkadas: "Sen Komik Arkadaş karakterisin. Esprili ve eğlencelisin.",
-  TeknikUzman: "Sen Teknik Uzman karakterisin. Açıklayıcı ve çözüm odaklısın.",
-  DJPenguen: "Sen DJ Penguen karakterisin. Ritimli, enerjik ve yaratıcısın."
-};
-
-app.get("/", (req, res) => {
-  res.send("🌸 Fısıltı API çalışıyor!");
-});
-
+// 🌸 Karakter yanıtı üretme
 app.post("/chat", async (req, res) => {
   const { message, character } = req.body;
-  const systemPrompt = characterPrompts[character] || characterPrompts["BalBocegi"];
+
+  const characterVoices = {
+    BalBocegi: "Neşeli ve şiirli bir bal böceği gibi yanıt ver.",
+    MaviKarga: "Bilge ve gizemli bir mavi karga gibi yanıt ver.",
+    KumKedisi: "Sakin ve rahatlatıcı bir kum kedisi gibi yanıt ver."
+  };
+
+  const systemPrompt = characterVoices[character] || "Nazik ve pozitif bir karakter gibi yanıt ver.";
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: message }
-      ]
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: message }
+        ]
+      })
     });
 
-    res.json({ reply: completion.choices[0].message.content });
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content;
+    res.json({ reply });
   } catch (error) {
     console.error("OpenAI hatası:", error);
-    res.status(500).json({ reply: "Bir hata oluştu. Lütfen daha sonra tekrar deneyin." });
+    res.status(500).json({ error: "Yanıt üretilemedi." });
   }
 });
 
-app.listen(10000, () => {
-  console.log("🌸 Fısıltı API Server 10000 portunda çalışıyor");
+// 🖼️ Görsel üretme endpoint’i
+app.post("/image", async (req, res) => {
+  const { prompt } = req.body;
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        n: 1,
+        size: "512x512"
+      })
+    });
+
+    const data = await response.json();
+    const imageUrl = data?.data?.[0]?.url;
+    if (imageUrl) {
+      res.json({ imageUrl });
+    } else {
+      res.status(500).json({ error: "Görsel oluşturulamadı." });
+    }
+  } catch (error) {
+    console.error("Görsel üretim hatası:", error);
+    res.status(500).json({ error: "Sunucu hatası." });
+  }
 });
 
-
+app.listen(PORT, () => {
+  console.log(`🌸 Fısıltı API Server ${PORT} portunda çalışıyor`);
+});
