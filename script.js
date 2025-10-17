@@ -1,8 +1,22 @@
+<script>
 document.addEventListener("DOMContentLoaded", () => {
   const sendButton = document.getElementById("sendButton");
   const messageInput = document.getElementById("messageInput");
   const characterSelect = document.getElementById("characterSelect");
   const responseBox = document.getElementById("responseBox"); // Tek yanıt kutusu
+
+  // 🎨 Karaktere göre arka plan renkleri
+  const backgrounds = {
+    BalBocegi: "#fff0f5",      // Pembe ton
+    MaviKarga: "#e0f7ff",      // Mavi ton
+    KumKedisi: "#fff8e1"       // Kum ton
+  };
+
+  // Arka planı karaktere göre değiştir
+  characterSelect.addEventListener("change", () => {
+    const selected = characterSelect.value;
+    document.body.style.backgroundColor = backgrounds[selected] || "#ffffff";
+  });
 
   sendButton.addEventListener("click", () => {
     const userMessage = messageInput.value.trim();
@@ -45,3 +59,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+</script>
