@@ -1,57 +1,60 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const { OpenAI } = require('openai');
-
-dotenv.config();
+const OpenAI = require('openai');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// CORS ayarı: sadece GitHub Pages frontend’ine izin ver
+const corsOptions = {
+  origin: 'https://ersanhar.github.io',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// OpenAI istemcisi
+// OpenAI API anahtarı ortam değişkeninden alınır
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+// Ana sayfa testi
+app.get('/', (req, res) => {
+  res.send('🌸 Fısıltı API çalışıyor!');
+});
+
 // Sağlık kontrolü
 app.get('/health', (req, res) => {
-  res.send('OK');
+  res.json({ status: 'online', timestamp: new Date().toISOString() });
 });
 
-// Basit sohbet endpoint'i
+// Chat rotası: karakterli yanıt üretir
 app.post('/chat', async (req, res) => {
-  const { message, character } = req.body;
-
-  if (!message) {
-    return res.status(400).json({ error: 'Mesaj eksik.' });
-  }
-
   try {
+    const { message, character } = req.body;
+
+    const systemPrompt = `Sen ${character} karakterisin. Nazik ve şiirsel bir üslubun var.`;
+
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: "gpt-3.5-turbo",
       messages: [
-        {
-          role: 'system',
-          content: `Sen ${character || 'nazik bir yardımcı'} gibi davranan bir asistansın.`
-        },
-        {
-          role: 'user',
-          content: message
-        }
-      ]
+        { role: "system", content: systemPrompt },
+        { role: "user", content: message }
+      ],
+      max_tokens: 500,
+      temperature: 0.8
     });
 
-    const reply = completion.choices[0].message.content;
-    res.json({ reply });
+    res.json({ reply: completion.choices[0].message.content });
   } catch (error) {
-    console.error('OpenAI hatası:', error);
-    res.status(500).json({ error: 'Yanıt alınamadı.' });
+    console.error("OpenAI hatası:", error.message);
+    res.status(500).json({ error: 'API hatası', message: error.message });
   }
 });
 
-app.listen(port, () => {
-  console.log(`Fısıltı API ${port} portunda çalışıyor`);
+// Sunucuyu başlat
+app.listen(PORT, () => {
+  console.log(`🌸 Fısıltı API Server ${PORT} portunda çalışıyor`);
 });
