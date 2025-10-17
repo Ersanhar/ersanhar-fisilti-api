@@ -87,8 +87,10 @@
         .then(data => {
           if (data.reply) {
             responseBox.innerText = data.reply;
+            console.log("Fısıltı cevabı:", data.reply);
           } else {
             responseBox.innerText = "Yanıt alınamadı.";
+            console.warn("Yanıt boş:", data);
           }
         })
         .catch(error => {
