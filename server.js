@@ -63,12 +63,6 @@ const OpenAI = require('openai');
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
-require('dotenv').config(); // .env dosyasını yükler
-
-const express = require('express');
-const cors = require('cors');
-const OpenAI = require('openai');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -84,12 +78,6 @@ app.use(express.json());
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
-require('dotenv').config(); // .env dosyasını yükler
-
-const express = require('express');
-const cors = require('cors');
-const OpenAI = require('openai');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -102,8 +90,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+
 
 
