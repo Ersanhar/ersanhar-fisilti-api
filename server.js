@@ -9,6 +9,7 @@ app.use(express.json());
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
+console.log("OpenAI anahtarı:", process.env.OPENAI_API_KEY);  
 });
 
 const characterPrompts = {
@@ -46,3 +47,4 @@ app.post("/chat", async (req, res) => {
 app.listen(10000, () => {
   console.log("🌸 Fısıltı API Server 10000 portunda çalışıyor");
 });
+
