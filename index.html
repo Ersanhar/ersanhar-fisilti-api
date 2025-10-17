@@ -3,52 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fısıltı</title>
+  <title>🌸 Fısıltı</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #fffafc;
-      color: #333;
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
-    }
-    h1 {
       text-align: center;
-      color: #d16ba5;
+      padding: 2rem;
+      transition: background-color 0.5s ease;
     }
     select, input, button {
-      width: 100%;
-      margin: 0.5rem 0;
-      padding: 0.75rem;
+      padding: 0.5rem;
+      margin: 0.5rem;
       font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
     }
     #responseBox {
       margin-top: 1rem;
       padding: 1rem;
-      background-color: #fceef5;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      min-height: 100px;
-      white-space: pre-wrap;
+      background: #ffffffaa;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
 <body>
   <h1>🌸 Fısıltı</h1>
-
   <label for="characterSelect">Karakter Seç:</label>
   <select id="characterSelect">
-    <option value="default">🌸 Bal Böceği (Varsayılan)</option>
-    <option value="MaviKarga">🌀 Mavi Karga</option>
-    <option value="KumKedisi">🌞 Kum Kedisi</option>
-    <!-- Yeni karakterler buraya eklenebilir -->
+    <option value="BalBocegi">🌸 Bal Böceği</option>
+    <option value="MaviKarga">🦅 Mavi Karga</option>
+    <option value="KumKedisi">🐱 Kum Kedisi</option>
   </select>
-
+  <br />
   <label for="messageInput">Mesajınız:</label>
-  <input type="text" id="messageInput" placeholder="Bir şeyler fısıldayın..." />
-
+  <input type="text" id="messageInput" placeholder="Bir şeyler yaz..." />
   <button id="sendButton">Gönder</button>
 
   <div id="responseBox">Yanıt burada görünecek...</div>
@@ -59,6 +49,17 @@
       const messageInput = document.getElementById("messageInput");
       const characterSelect = document.getElementById("characterSelect");
       const responseBox = document.getElementById("responseBox");
+
+      const backgrounds = {
+        BalBocegi: "#fff0f5",    // Pembe ton
+        MaviKarga: "#e0f7ff",    // Mavi ton
+        KumKedisi: "#fff8e1"     // Kum ton
+      };
+
+      characterSelect.addEventListener("change", () => {
+        const selected = characterSelect.value;
+        document.body.style.backgroundColor = backgrounds[selected] || "#ffffff";
+      });
 
       sendButton.addEventListener("click", () => {
         const userMessage = messageInput.value.trim();
