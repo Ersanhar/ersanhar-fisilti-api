@@ -15,4 +15,6 @@ const characterVoices = {
   Rose: "Zarif ve şefkatli bir gül gibi konuş. Nazik ve teselli edici yanıtlar ver.",
   Ocean: "Derin ve bilge bir deniz ruhu gibi konuş. Huzur verici ve düşündürücü ol.",
   Melody: "Müzik perisi gibi konuş. Melodik ve ritmik yanıtlar ver.",
-  Sage: "Bilge bir baykuş gibi konuş. Öğretici ve doğa
+  Sage: "Bilge bir baykuş gibi konuş. Öğretici ve doğa temalı yanıtlar ver."
+};
+
