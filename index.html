@@ -3,144 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🌸 Fısıltı</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 2rem;
-      transition: background-color 0.5s ease;
-    }
-    select, input, button {
-      padding: 0.5rem;
-      margin: 0.5rem;
-      font-size: 1rem;
-    }
-    #responseBox {
-      margin-top: 1rem;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: #ffffffaa;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #generatedImage {
-      max-width: 100%;
-      margin-top: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-  </style>
+  <title>🌸 Fısıltı Evreni</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>🌸 Fısıltı</h1>
+<body class="bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 min-h-screen p-6 font-sans">
+
+  <h1 class="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-8">
+    🌸 Fısıltı Karakterleriyle Sohbet Et 🌸
+  </h1>
 
   <!-- Karakter Seçimi -->
-  <label for="characterSelect">Karakter Seç:</label>
-  <select id="characterSelect">
-    <option value="BalBocegi">🌸 Bal Böceği</option>
-    <option value="MaviKarga">🦅 Mavi Karga</option>
-    <option value="KumKedisi">🐱 Kum Kedisi</option>
-  </select>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
+    <button onclick="selectCharacter('Luna')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+      🌙 <strong>Luna</strong><br><span class="text-sm text-purple-500 italic">Ay Işığının Şiirsel Ruhu</span>
+    </button>
+    <button onclick="selectCharacter('Sunny')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+      ☀️ <strong>Sunny</strong><br><span class="text-sm text-yellow-500 italic">Neşenin Parlak Yüzü</span>
+    </button>
+    <button onclick="selectCharacter('Rose')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+      🌹 <strong>Rose</strong><br><span class="text-sm text-rose-500 italic">Zarafetin Narin Çiçeği</span>
+    </button>
+    <button onclick="selectCharacter('Ocean')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+      🌊 <strong>Ocean</strong><br><span class="text-sm text-blue-500 italic">Derin Suların Bilge Sesi</span>
+    </button>
+    <button onclick="selectCharacter('Melody')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+      🎵 <strong>Melody</strong><br><span class="text-sm text-indigo-500 italic">Müziğin Büyülü Dansçısı</span>
+    </button>
+    <button onclick="selectCharacter('Sage')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+      🦉 <strong>Sage</strong><br><span class="text-sm text-emerald-500 italic">Doğanın Bilge Rehberi</span>
+    </button>
+  </div>
 
-  <!-- Mesaj Gönderme -->
-  <br />
-  <label for="messageInput">Mesajınız:</label>
-  <input type="text" id="messageInput" placeholder="Bir şeyler yaz..." />
-  <button id="sendButton">Gönder</button>
+  <!-- Sohbet Alanı -->
+  <div class="max-w-3xl mx-auto bg-white/80 p-6 rounded-2xl shadow-lg mb-12">
+    <h2 class="text-xl font-semibold mb-4 text-purple-700">💬 Sohbet Başlat</h2>
+    <input type="text" id="messageInput" placeholder="Mesajınızı yazın..." class="w-full p-3 border border-purple-300 rounded-xl mb-4" />
+    <button onclick="sendMessage()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-pink-600 transition">
+      Gönder 💌
+    </button>
+    <div id="responseBox" class="mt-6 text-gray-800 italic"></div>
+  </div>
 
-  <div id="responseBox">Yanıt burada görünecek...</div>
+  <!-- Görsel Üretim -->
+  <div class="max-w-3xl mx-auto bg-white/80 p-6 rounded-2xl shadow-lg">
+    <h2 class="text-xl font-semibold mb-4 text-indigo-700">🎨 Görsel Üret</h2>
+    <input type="text" id="imagePrompt" placeholder="Görsel açıklaması yazın..." class="w-full p-3 border border-indigo-300 rounded-xl mb-4" />
+    <button onclick="generateImage()" class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-xl hover:from-indigo-600 hover:to-purple-600 transition">
+      Görsel Oluştur 🖼️
+    </button>
+    <img id="generatedImage" src="" alt="Oluşturulan Görsel" class="mt-6 rounded-xl shadow max-w-full" />
+  </div>
 
-  <!-- Görsel Üretme -->
-  <h2>🎨 Görsel Üret</h2>
-  <input type="text" id="imagePrompt" placeholder="Görsel açıklaması yaz..." />
-  <button id="generateImage">Görsel Oluştur</button>
-  <img id="generatedImage" src="" alt="Oluşturulan Görsel" />
-
-  <!-- Script -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const sendButton = document.getElementById("sendButton");
-      const messageInput = document.getElementById("messageInput");
-      const characterSelect = document.getElementById("characterSelect");
-      const responseBox = document.getElementById("responseBox");
+    let selectedCharacter = "Luna";
 
-      const backgrounds = {
-        BalBocegi: "#fff0f5",
-        MaviKarga: "#e0f7ff",
-        KumKedisi: "#fff8e1"
-      };
+    function selectCharacter(name) {
+      selectedCharacter = name;
+      alert(`${name} karakteri seçildi!`);
+    }
 
-      characterSelect.addEventListener("change", () => {
-        const selected = characterSelect.value;
-        document.body.style.backgroundColor = backgrounds[selected] || "#ffffff";
+    function sendMessage() {
+      const userMessage = document.getElementById("messageInput").value.trim();
+      if (!userMessage) return;
+
+      fetch("https://ersanhar-fisilti-api.onrender.com/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMessage,
+          character: selectedCharacter
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("responseBox").innerText = data.reply || "Yanıt alınamadı.";
+      })
+      .catch(err => {
+        console.error("Hata:", err);
+        document.getElementById("responseBox").innerText = "Sunucuya bağlanılamadı.";
       });
+    }
 
-      sendButton.addEventListener("click", () => {
-        const userMessage = messageInput.value.trim();
-        let selectedCharacter = characterSelect?.value;
+    function generateImage() {
+      const prompt = document.getElementById("imagePrompt").value.trim();
+      if (!prompt) return;
 
-        if (!userMessage) {
-          responseBox.innerText = "Lütfen bir mesaj yazın.";
-          return;
+      fetch("https://ersanhar-fisilti-api.onrender.com/image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.imageUrl) {
+          document.getElementById("generatedImage").src = data.imageUrl;
+        } else {
+          alert("Görsel oluşturulamadı.");
         }
-
-        if (!selectedCharacter || selectedCharacter === "default") {
-          selectedCharacter = "BalBocegi";
-        }
-
-        fetch("https://ersanhar-fisilti-api.onrender.com/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: userMessage,
-            character: selectedCharacter
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.reply) {
-            responseBox.innerText = data.reply;
-            console.log("Fısıltı cevabı:", data.reply);
-          } else {
-            responseBox.innerText = "Yanıt alınamadı.";
-            console.warn("Yanıt boş:", data);
-          }
-        })
-        .catch(error => {
-          console.error("Hata:", error);
-          responseBox.innerText = "Sunucuya bağlanılamadı.";
-        });
+      })
+      .catch(err => {
+        console.error("Görsel hatası:", err);
+        alert("Sunucuya bağlanılamadı.");
       });
-
-      // Görsel üretme
-      document.getElementById("generateImage").addEventListener("click", () => {
-        const prompt = document.getElementById("imagePrompt").value.trim();
-        if (!prompt) return;
-
-        fetch("https://ersanhar-fisilti-api.onrender.com/image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.imageUrl) {
-            document.getElementById("generatedImage").src = data.imageUrl;
-          } else {
-            alert("Görsel oluşturulamadı.");
-          }
-        })
-        .catch(err => {
-          console.error("Görsel hatası:", err);
-          alert("Sunucuya bağlanılamadı.");
-        });
-      });
-    });
+    }
   </script>
 </body>
 </html>
