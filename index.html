@@ -6,7 +6,7 @@
   <title>🌸 Fısıltı Evreni</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 min-h-screen p-6 font-sans">
+<body id="body" class="bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 min-h-screen p-6 font-sans">
 
   <h1 class="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-8">
     🌸 Fısıltı Karakterleriyle Sohbet Et 🌸
@@ -14,33 +14,20 @@
 
   <!-- Karakter Seçimi -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
-    <button onclick="selectCharacter('Luna')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
-      🌙 <strong>Luna</strong><br><span class="text-sm text-purple-500 italic">Ay Işığının Şiirsel Ruhu</span>
-    </button>
-    <button onclick="selectCharacter('Sunny')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
-      ☀️ <strong>Sunny</strong><br><span class="text-sm text-yellow-500 italic">Neşenin Parlak Yüzü</span>
-    </button>
-    <button onclick="selectCharacter('Rose')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
-      🌹 <strong>Rose</strong><br><span class="text-sm text-rose-500 italic">Zarafetin Narin Çiçeği</span>
-    </button>
-    <button onclick="selectCharacter('Ocean')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
-      🌊 <strong>Ocean</strong><br><span class="text-sm text-blue-500 italic">Derin Suların Bilge Sesi</span>
-    </button>
-    <button onclick="selectCharacter('Melody')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
-      🎵 <strong>Melody</strong><br><span class="text-sm text-indigo-500 italic">Müziğin Büyülü Dansçısı</span>
-    </button>
-    <button onclick="selectCharacter('Sage')" class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
-      🦉 <strong>Sage</strong><br><span class="text-sm text-emerald-500 italic">Doğanın Bilge Rehberi</span>
-    </button>
+    <button onclick="selectCharacter('Luna')" class="character-btn">🌙 Luna</button>
+    <button onclick="selectCharacter('Sunny')" class="character-btn">☀️ Sunny</button>
+    <button onclick="selectCharacter('Rose')" class="character-btn">🌹 Rose</button>
+    <button onclick="selectCharacter('Ocean')" class="character-btn">🌊 Ocean</button>
+    <button onclick="selectCharacter('Melody')" class="character-btn">🎵 Melody</button>
+    <button onclick="selectCharacter('Sage')" class="character-btn">🦉 Sage</button>
   </div>
 
   <!-- Sohbet Alanı -->
   <div class="max-w-3xl mx-auto bg-white/80 p-6 rounded-2xl shadow-lg mb-12">
     <h2 class="text-xl font-semibold mb-4 text-purple-700">💬 Sohbet Başlat</h2>
     <input type="text" id="messageInput" placeholder="Mesajınızı yazın..." class="w-full p-3 border border-purple-300 rounded-xl mb-4" />
-    <button onclick="sendMessage()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-pink-600 transition">
-      Gönder 💌
-    </button>
+    <button onclick="sendMessage()" class="btn-purple">Gönder 💌</button>
+    <button onclick="sendPoem()" class="btn-indigo mt-2">Şiir Yaz 🎶</button>
     <div id="responseBox" class="mt-6 text-gray-800 italic"></div>
   </div>
 
@@ -48,17 +35,26 @@
   <div class="max-w-3xl mx-auto bg-white/80 p-6 rounded-2xl shadow-lg">
     <h2 class="text-xl font-semibold mb-4 text-indigo-700">🎨 Görsel Üret</h2>
     <input type="text" id="imagePrompt" placeholder="Görsel açıklaması yazın..." class="w-full p-3 border border-indigo-300 rounded-xl mb-4" />
-    <button onclick="generateImage()" class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-xl hover:from-indigo-600 hover:to-purple-600 transition">
-      Görsel Oluştur 🖼️
-    </button>
+    <button onclick="generateImage()" class="btn-indigo">Görsel Oluştur 🖼️</button>
     <img id="generatedImage" src="" alt="Oluşturulan Görsel" class="mt-6 rounded-xl shadow max-w-full" />
   </div>
 
   <script>
     let selectedCharacter = "Luna";
+    const themes = {
+      Luna: { bg: "from-indigo-900 via-purple-800 to-indigo-700", prompt: "Ay ışığında dans eden Luna perisi" },
+      Sunny: { bg: "from-yellow-200 via-orange-100 to-yellow-300", prompt: "Güneş altında zıplayan neşeli çocuk" },
+      Rose: { bg: "from-rose-100 via-pink-100 to-rose-200", prompt: "Gül bahçesinde yürüyen zarif karakter" },
+      Ocean: { bg: "from-blue-200 via-cyan-100 to-blue-300", prompt: "Deniz dalgalarıyla konuşan bilge ruh" },
+      Melody: { bg: "from-indigo-200 via-purple-100 to-indigo-300", prompt: "Müzik notalarıyla çevrili dans eden peri" },
+      Sage: { bg: "from-emerald-200 via-green-100 to-emerald-300", prompt: "Ormanda kitap okuyan bilge baykuş" }
+    };
 
     function selectCharacter(name) {
       selectedCharacter = name;
+      const theme = themes[name];
+      document.getElementById("body").className = `bg-gradient-to-br ${theme.bg} min-h-screen p-6 font-sans`;
+      document.getElementById("imagePrompt").value = theme.prompt;
       alert(`${name} karakteri seçildi!`);
     }
 
@@ -69,18 +65,23 @@
       fetch("https://ersanhar-fisilti-api.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userMessage,
-          character: selectedCharacter
-        })
+        body: JSON.stringify({ message: userMessage, character: selectedCharacter })
       })
       .then(res => res.json())
       .then(data => {
         document.getElementById("responseBox").innerText = data.reply || "Yanıt alınamadı.";
+      });
+    }
+
+    function sendPoem() {
+      fetch("https://ersanhar-fisilti-api.onrender.com/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Lütfen bana şiirsel bir şey söyle.", character: selectedCharacter })
       })
-      .catch(err => {
-        console.error("Hata:", err);
-        document.getElementById("responseBox").innerText = "Sunucuya bağlanılamadı.";
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("responseBox").innerText = data.reply || "Yanıt alınamadı.";
       });
     }
 
@@ -95,17 +96,46 @@
       })
       .then(res => res.json())
       .then(data => {
-        if (data.imageUrl) {
-          document.getElementById("generatedImage").src = data.imageUrl;
-        } else {
-          alert("Görsel oluşturulamadı.");
-        }
-      })
-      .catch(err => {
-        console.error("Görsel hatası:", err);
-        alert("Sunucuya bağlanılamadı.");
+        document.getElementById("generatedImage").src = data.imageUrl || "";
       });
     }
   </script>
+
+  <style>
+    .character-btn {
+      background: white;
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+    .character-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+    .btn-purple {
+      background: linear-gradient(to right, #a855f7, #ec4899);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .btn-purple:hover {
+      background: linear-gradient(to right, #9333ea, #db2777);
+    }
+    .btn-indigo {
+      background: linear-gradient(to right, #6366f1, #8b5cf6);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .btn-indigo:hover {
+      background: linear-gradient(to right, #4f46e5, #7c3aed);
+    }
+  </style>
 </body>
 </html>
